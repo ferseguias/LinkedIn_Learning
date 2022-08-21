@@ -39,4 +39,16 @@ ON fpc."CountryCode" = ps."country_code"
 WHERE fpc."Date" = '2018-10-16'
 ORDER BY penetration_ratio DESC
 LIMIT 10;
+--6
+SELECT ps."country_name", fpc."NumberOfFans"
+FROM "PopStats" AS ps
+JOIN "FansPerCountry" AS fpc
+ON ps."country_code" = fpc."CountryCode"
+WHERE ps."population" > 20000000
+AND fpc."Date" = '2018-10-16'
+ORDER BY fpc."NumberOfFans"
+LIMIT 10;
+--7
+
+
 
