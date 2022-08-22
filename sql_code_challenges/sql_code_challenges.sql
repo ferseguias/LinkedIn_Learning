@@ -49,6 +49,16 @@ AND fpc."Date" = '2018-10-16'
 ORDER BY fpc."NumberOfFans"
 LIMIT 10;
 --7
+SELECT DISTINCT fpc.date, ps.country_name, fpc.city, fpc.number_of_fans
+FROM "FansPerCity" AS fpc
+JOIN "PopStats" AS ps
+ON fpc."country_code" = ps."country_code"
+WHERE fpc."date" = (SELECT MAX(date) FROM "FansPerCity")
+ORDER BY fpc.number_of_fans DESC;
+--8
+SELECT country_id, date, gdp, AVG(gdp) OVER(PARTITION BY country_id) AS average_gdp
+FROM "CountryStats";
+--9
 
 
 
