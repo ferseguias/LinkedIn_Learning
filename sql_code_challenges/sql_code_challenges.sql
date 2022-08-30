@@ -59,6 +59,53 @@ ORDER BY fpc.number_of_fans DESC;
 SELECT country_id, date, gdp, AVG(gdp) OVER(PARTITION BY country_id) AS average_gdp
 FROM "CountryStats";
 --9
-
-
+SELECT region, athlete_id, SUM("Gold") AS gold_medals_count,
+ROW_NUMBER() OVER(PARTITION BY region ORDER BY SUM("Gold") DESC) AS rank_medals
+FROM "GamesStats" AS gs
+JOIN "CountryRegions" AS cr
+ON gs."country_id" = cr."id"
+JOIN "Athletes" AS ath
+ON gs."athlete_id" = ath."id"
+GROUP BY region, athlete_id;
+--10
+SELECT gs."sport",
+CASE WHEN ath."weight" * 100.00 / (ath."height") ^ 2.00 < 0.25 THEN '< 0.25'
+WHEN ath."weight" * 100.00 / (ath."height") ^ 2.00 >= 0.25 AND ath."weight" * 100.00 / (ath."height") ^ 2.00 <= 0.30 THEN '0.25 - 0.30' 
+WHEN ath."weight" * 100.00 / (ath."height") ^ 2.00 > 0.30 THEN '> 0.30'
+END AS bmi_bucket,
+COUNT(DISTINCT ath."id") AS athletes_count
+FROM "GamesStats" AS gs
+JOIN "Athletes" AS ath
+ON gs."athlete_id" = ath."id"
+GROUP BY sport, bmi_bucket
+ORDER BY sport, athletes_count DESC;
+--11
+SELECT *, AVG(close) OVER(ORDER BY date ROWS 5 PRECEDING) AS ma_6
+FROM "StockPrice"
+ORDER BY date ASC;
+--12
+SELECT CASE DATE_PART('DOW', cast(created_time AS date))
+WHEN 0 THEN 'Domingo'
+WHEN 1 THEN 'Lunes'
+WHEN 2 THEN 'Martes'
+WHEN 3 THEN 'Miercoles'
+WHEN 4 THEN 'Jueves'
+WHEN 5 THEN 'Viernes'
+WHEN 6 THEN 'Sabado'
+END AS day_of_week,
+ROUND(AVG(engaged_fans * 100.00 / reach), 2) AS avg_engagement
+FROM "PostInsights"
+GROUP BY day_of_week
+ORDER BY avg_engagement DESC;
+--13
+SELECT region, TRIM(REPLACE(REPLACE(region, '.', ''), '&', 'AND')) AS cleaned_region
+FROM "CountryRegions"
+WHERE region = 'LATIN AMER. & CARIB    '
+GROUP BY region;
+--14
+SELECT sport, athlete_id, COALESCE(medal, 'NA') AS medal_clean
+FROM "Games";
+--15
+SELECT *, REGEXP_MATCHES(event, 'Women|Men') women_men
+FROM "GamesStats";
 
